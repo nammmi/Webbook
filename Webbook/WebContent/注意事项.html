@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+1.在主题帖id和主题帖类型添加索引
+
+2.之所以不用框架，是因为还是从基础开始，把原理弄清楚....
+
+3.应用了工厂模式，引入dao层service层，dao层实现与数据库交互，便于日后更换别的数据库，上层无需改变。service层为业务层功能的实现，依赖于工厂向外提供产品。工厂的实现又依赖于下面数据访问层代码。使用分层设计思想，有助于代码的细化，便于后期的更新与维护。
+
+4.应对同一用户发帖作时间限制。
+
+5.点赞多的优先显示。
+
+6.管理员删帖。
+
+7.用户状态，有效，失效。
+
+8.用户未登录可以看帖子，不可以发帖子。
+
+9.主题帖排序按照最近回帖顺序，可以建立视图，关联主题帖和最近回复。
+
+10.触发器 更新webbook表里的回复次数。
+
+11.回复主题帖过程中，主题帖子被删除，怎么办？根据floorid==0确定
+
+12.JavaScript验证表单。
+
+SELECT webbook.mainnotetype, webbook.mainnotetitle, webbook.username, webbook.createtime, webbook.quotecount, webbook.viewcount, replynote.username, MAX(replynote.createtime) from webbook, replynote GROUP BY replynote.mainnoteid
+CREATE VIEW listofnotes AS SELECT replynote.mainnoteid, webbook.mainnotetype, webbook.mainnotetitle, webbook.username, webbook.createtime, webbook.quotecount, webbook.viewcount, replynote.username "replynotename", MAX(replynote.createtime) from webbook, replynote GROUP BY replynote.mainnoteid
+CREATE VIEW listofnotes AS SELECT replynote.mainnoteid, webbook.mainnotetype, webbook.mainnotetitle, webbook.username, webbook.createtime, webbook.quotecount, webbook.viewcount, replynote.username "replynotename", MAX(replynote.createtime) from webbook, replynote WHERE webbook.id = replynote.mainnoteid GROUP BY replynote.mainnoteid ORDER BY MAX(replynote.createtime) DESC
+CREATE VIEW listofnotes AS SELECT replynote.mainnoteid, webbook.mainnotetype, webbook.mainnotetitle, webbook.username, webbook.createtime, webbook.quotecount, webbook.viewcount, replynote.username "replynotename", MAX(replynote.createtime) "maxcreatetime" from webbook, replynote WHERE webbook.id = replynote.mainnoteid GROUP BY replynote.mainnoteid ORDER BY MAX(replynote.createtime) DESC
+SELECT * FROM replynote WHERE createtime in (SELECT MAX(createtime) FROM replynote GROUP BY replynote.mainnoteid) 
+SELECT replynote.mainnoteid, replynote.username, replynote.createtime FROM replynote WHERE replynote.createtime in (SELECT MAX(replynote.createtime) FROM replynote GROUP BY replynote.mainnoteid) ORDER BY replynote.createtime DESC
+CREATE VIEW listofnotestest4 AS SELECT replynote.mainnoteid, webbook.mainnotetype, webbook.mainnotetitle, webbook.username, webbook.createtime, webbook.quotecount, webbook.viewcount, replynote.username "replynotename", replynote.createtime "maxcreatetime" from webbook, replynote WHERE webbook.id = replynote.mainnoteid AND replynote.createtime in (SELECT MAX(replynote.createtime) FROM replynote GROUP BY replynote.mainnoteid) ORDER BY replynote.createtime DESC
+CREATE VIEW listofnotestest AS SELECT replynote.mainnoteid, webbook.mainnotetype, webbook.mainnotetitle, webbook.username, webbook.createtime, webbook.quotecount, webbook.viewcount, replynote.username "replynotename", replynote.createtime "maxcreatetime" from webbook, replynote WHERE webbook.id = replynote.mainnoteid AND replynote.createtime in (SELECT MAX(replynote.createtime) FROM replynote GROUP BY replynote.mainnoteid) ORDER BY replynote.createtime DESC
+</body>
+</html>
